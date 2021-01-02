@@ -1,7 +1,8 @@
-const forms = () => {
+import checkNumInputs from "./checkNumInputs";
+
+const forms = (modalState) => {
     const formList = document.querySelectorAll('form');
     const inputList = document.querySelectorAll('input');
-    const phoneList = document.querySelectorAll('input[name="user_phone"]');
 
     const message = {
         loading: 'Loading...',
@@ -9,11 +10,7 @@ const forms = () => {
         failure: 'Something went wrong...'
     };
 
-    phoneList.forEach(phone => {
-        phone.addEventListener('input', () => {
-            phone.value = phone.value.replace(/\D/, '');
-        });
-    });
+    checkNumInputs('input[name="user_phone"]');
 
     const postData = async (url, data) => {
         document.querySelector('.status').textContent = message.loading;
@@ -40,6 +37,11 @@ const forms = () => {
             form.appendChild(statusMessage);
 
             const formData = new FormData(form);
+            if (form.getAttribute('data-calc' ) === 'end') {
+                for (let key in modalState) {
+                    formData.append(key, modalState[key]);
+                }
+            }
 
             postData('assets/server.php', formData)
                 .then(res => {
